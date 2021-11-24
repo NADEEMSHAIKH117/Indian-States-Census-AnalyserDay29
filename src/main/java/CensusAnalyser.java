@@ -3,6 +3,7 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
+import java.util.stream.StreamSupport;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -16,14 +17,11 @@ public class CensusAnalyser {
 					.withType(IndiaCensusCSV.class)
 					.withIgnoreLeadingWhiteSpace(true)
 					.build();
-			// iterator doesn't consume memory
 		      Iterator<IndiaCensusCSV> iterator = csvToBean.iterator();
-	            int numOfEntries = 0;
-	            while (iterator.hasNext()) {
-	                numOfEntries++;
-	                iterator.next();
-	            }
-	            return numOfEntries;
+		   // iterator doesn't consume memory
+		      Iterable<IndiaCensusCSV> csvIterable = () -> iterator;
+	            int count = (int) StreamSupport.stream(csvIterable.spliterator(), true).count();
+	            return count;
 	        } catch (
 	                IOException e) {
 	            System.out.println(e);
